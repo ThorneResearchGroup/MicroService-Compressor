@@ -47,7 +47,7 @@
   </build>
   <repositories>
     <repository>
-      <id>TRGRepo-releases</id>
+      <id>TRG</id>
       <name>The TRG repository</name>
       <url>https://maven.tresearchgroup.tech/releases</url>
     </repository>
