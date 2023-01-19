@@ -1,0 +1,198 @@
+openapi: 3.0.0
+info:
+  description: |
+    This is the compressor API spec sheet
+  version: "1.0.0"
+  title: Compressor API
+  contact:
+    email: support@tresearchgroup.tech
+    name: Tech Support
+  license:
+    name: GPL V3
+    url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+servers:
+  - url: 'https://api.tresearchgroup.tech'
+tags:
+  - name: general
+    description: All endpoints for the compression microservice
+paths:
+  /v1/{compressDecompres}/{method}:
+    get:
+      tags:
+        - general
+      summary: Get the compressed binary of a string
+      operationId: getCompressedString
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: method
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: string
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the compressed string
+          content:
+            application/binary:
+              schema:
+                type: object
+        '500':
+          description: The server encountered an error
+      security:
+        - Authorization: [ ]
+    post:
+      tags:
+        - general
+      summary: Compresses the submitted binary
+      operationId: postCompressedData
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: method
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The artist was inserted successfully
+          content:
+            application/binary:
+              schema:
+                type: object
+        '500':
+          description: The server encountered an error
+      requestBody:
+        $ref: '#/components/requestBodies/UploadRequestBody'
+      security:
+        - Authorization: [ ]
+    options:
+      tags:
+        - general
+      summary: Get options
+      description: Show all options for the endpoint
+      operationId: optionsCompressedData
+      responses:
+        '200':
+          description: Returns with the allow header, which outlines the available methods
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "GET, POST"
+  /v1/{compressDecompres}/{method}/{type}:
+    get:
+      tags:
+        - general
+      summary: Get the compressed binary of a string
+      operationId: getCompressedStringSubType
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: method
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: string
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the compressed string
+          content:
+            application/binary:
+              schema:
+                type: object
+        '500':
+          description: The server encountered an error
+      security:
+        - Authorization: [ ]
+    post:
+      tags:
+        - general
+      summary: Compresses the submitted binary
+      operationId: postCompressedDataSubType
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: method
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The artist was inserted successfully
+          content:
+            application/binary:
+              schema:
+                type: object
+        '500':
+          description: The server encountered an error
+      requestBody:
+        $ref: '#/components/requestBodies/UploadRequestBody'
+      security:
+        - Authorization: [ ]
+    options:
+      tags:
+        - general
+      summary: Get options
+      description: Show all options for the endpoint
+      operationId: optionsCompressedData
+      responses:
+        '200':
+          description: Returns with the allow header, which outlines the available methods
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "GET, POST"
+components:
+  requestBodies:
+    UploadRequestBody:
+      content:
+        application/octet-stream:
+          schema:
+            type: object
+            properties:
+              fileName:
+                type: string
+                format: binary
+      description: The file you wish to upload
+      required: true
+  securitySchemes:
+    Authorization:
+      type: apiKey
+      name: Authorization
+      in: header

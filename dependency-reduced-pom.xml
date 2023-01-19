@@ -49,7 +49,7 @@
     <repository>
       <id>TRGRepo-releases</id>
       <name>The TRG repository</name>
-      <url>http://192.168.2.200:8080/releases</url>
+      <url>https://maven.tresearchgroup.tech/releases</url>
     </repository>
   </repositories>
   <properties>

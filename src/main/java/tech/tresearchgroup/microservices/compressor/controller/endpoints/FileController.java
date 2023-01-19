@@ -1,4 +1,4 @@
-package tech.tresearchgroup.microservices.compressor.controller.endpoints.compression;
+package tech.tresearchgroup.microservices.compressor.controller.endpoints;
 
 import io.activej.csp.file.ChannelFileWriter;
 import io.activej.http.HttpRequest;
@@ -7,7 +7,8 @@ import io.activej.http.MultipartDecoder;
 import io.activej.inject.annotation.Provides;
 import io.activej.promise.Promisable;
 import org.jetbrains.annotations.NotNull;
-import tech.tresearchgroup.microservices.compressor.controller.CompressionController;
+import tech.tresearchgroup.libraries.compression.controller.ByteCompressionController;
+import tech.tresearchgroup.schemas.compression.model.CompressDecompressEnum;
 import tech.tresearchgroup.schemas.compression.model.CompressionMethodEnum;
 
 import java.io.File;
@@ -30,9 +31,10 @@ public class FileController {
         try {
             UUID uuid = UUID.randomUUID();
             Path file = new File("temp/" + uuid + ".tmp").toPath();
+            CompressDecompressEnum compressDecompressEnum = CompressDecompressEnum.valueOf(httpRequest.getPathParameter("compressDecompress").toUpperCase());
             return httpRequest.handleMultipart(MultipartDecoder.MultipartDataHandler.file(fileName ->
                     ChannelFileWriter.open(executor(), file)))
-                .map($ -> compress(method, file));
+                .map($ -> run(compressDecompressEnum, method, file));
         } catch (Exception e) {
             e.printStackTrace();
             return HttpResponse.ofCode(500);
@@ -52,9 +54,14 @@ public class FileController {
         }
     }
 
-    private static HttpResponse compress(CompressionMethodEnum method, Path path) throws IOException {
+    private static HttpResponse run(CompressDecompressEnum compressDecompressEnum, CompressionMethodEnum method, Path path) throws IOException {
         FileInputStream fis = new FileInputStream(path.toFile());
-        byte[] data = CompressionController.compress(fis, method);
+        byte[] data = null;
+        if(compressDecompressEnum.equals(CompressDecompressEnum.COMPRESS)) {
+            data = ByteCompressionController.compress(fis, method);
+        } else if(compressDecompressEnum.equals(CompressDecompressEnum.DECOMPRESS)) {
+            data = ByteCompressionController.decompress(fis, method);
+        }
         fis.close();
         if(data == null) {
             return HttpResponse.ofCode(500);
@@ -67,9 +74,7 @@ public class FileController {
 
     public static HttpResponse getBestCompressor(Path path) {
         try {
-            FileInputStream fis = new FileInputStream(path.toFile());
-            Map<String, Double> results = CompressionController.getBestCompressor(fis);
-            fis.close();
+            Map<String, Double> results = ByteCompressionController.getBestCompressor(path.toFile());
             return HttpResponse.ok200().withBody(results.toString().getBytes());
         } catch (Exception e) {
             e.printStackTrace();
